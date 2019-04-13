@@ -38,7 +38,32 @@ router.post('/register', (req, res) => {
           })
         })
       }
-    })
-})
+    });
+});
+
+
+router.post('/login', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // finds user by email
+  User.findOne({email: email}).then(user => { // with es6 you could just put email once here and take out semi-colon 
+
+    // check if user exists 
+    if (!user) {
+      return res.status(404).json({ email: 'User not found' });
+    }
+
+    // check if password is correct 
+    bcrypt.compare(password, user.password).then(isMatch => {
+      if (isMatch) {
+        res.json({ msg: 'Success' });
+      } else {
+        return res.status(400).json({ password: 'Wrong password' });
+      }
+    });
+  });
+});
+
 
 module.exports = router;
